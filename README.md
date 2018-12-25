@@ -257,11 +257,11 @@ raveloxmidi ファイル指定実行
 
     $ raveloxmidi -N -c ~/.config/raveloxmidi-rsmidi.conf
 
-これで [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) が動作する環境より任意の MIDI 再生ソフトからの MIDI 再生が可能になり  
-Raspberry PI 経由で外部 MIDI 音源へ MIDI 出力可能となります。
+これで [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) が動作する環境より任意の MIDI 再生ソフトからの MIDI 再生が可能になり Raspberry PI 経由で外部 MIDI 音源へ MIDI 出力可能となります。
 
 残念なことに [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) は MIDI IN データをアプリケーションへ通知しなかったと思います。  
-受けてるけどアプリ側へ渡すロジックを実装忘れまたは事情により実装したくないだったような。うろ覚えです。間違っていたらご指摘下さい。
+受けてるけどアプリ側へ渡すロジックを実装忘れまたは事情により実装したくないだったような。  
+うろ覚えです。間違っていたらご指摘下さい。
 
 # 8. その他
 
