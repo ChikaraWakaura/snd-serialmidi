@@ -15,7 +15,8 @@ Raspberry PI でもシリアル MIDI できるはずだし過去の記憶をた�
 Raspberry PI に入ってるとは(笑)
 
 /dev/tty* が利用可能な ko があったと思い ALSA 単独の最終版 [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/)
-をみると drivers/ に serialmidi.c が、ぽつんと取り残されてる(笑)
+をみると drivers/ に  
+serialmidi.c が、ぽつんと取り残されてる(笑)
 
 えええええ(笑)　どうして?(笑)
 
@@ -69,8 +70,7 @@ HOST スイッチが実装されていないもっと古いハードは DIN コ�
 
 # 4. ソフト準備編
 
-ALSA 単独の最終版 [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/) の doc/serialmidi.txt には  
-linux kernel 統合されなかった経緯は何も書かれていませんでした。
+ALSA 単独の最終版 [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/) の doc/serialmidi.txt には linux kernel 統合されなかった経緯は何も書かれていませんでした。
 
 残された drivers/serialmidi.c を読むしかありません...  
 
@@ -93,21 +93,22 @@ tty 側の write_wakeup 関数へのポインタを自身側に差し替えい�
 
 じっくり読んだ結果以下の問題がわかりました。
 
-(1) magic なコードは tty 側のアーキテクチャをハックしているので移植性が低い
-(2) MIDI : F5 NN の必要性は、当時ご理解されているみたい。実装はされていない
-(3) IN or OUT ポートを 1 以上にした場合に確実に close_tty() -> filp_close() で serial->file が NULL
-(4) 誤作動 SERIAL_MODE_BIT_* が実はビット値になっていない
-(5) カーネルメモリリーク or NULL 解放 428 行目 if (serial->sdev); となっている( ; が最後に書かれている)
+(1) magic なコードは tty 側のアーキテクチャをハックしているので移植性が低い  
+(2) MIDI : F5 NN の必要性は、当時ご理解されているみたい。実装はされていない  
+(3) IN or OUT ポートを 1 以上にした場合に確実に close_tty() -> filp_close() で serial->file が NULL  
+(4) 誤作動 SERIAL_MODE_BIT_* が実はビット値になっていない  
+(5) カーネルメモリリーク or NULL 解放 428 行目 if (serial->sdev); となっている( ; が最後に書かれている)  
 
 以下、各対策と改善方法です。
 
-(1) MIDI IN(シリアル受信)は純粋に kthread と ldisc->ops->read() を使用し、MIDI OUT(シリアル送信)は純粋に ldisc->ops->write() を使用
-(2) F5 NN 実装
-(3) 発生しないように改修
-(4) ビット値を正しく実装と副作用なし視点での動作確認
-(5) カーネルメモリリーク or NULL 解放を発生させないように改修
+(1) MIDI IN(シリアル受信)は純粋に kthread と ldisc->ops->read() を使用し、  
+    MIDI OUT(シリアル送信)は純粋に ldisc->ops->write() を使用  
+(2) F5 NN 実装  
+(3) 発生しないように改修  
+(4) ビット値を正しく実装と副作用なし視点での動作確認  
+(5) カーネルメモリリーク or NULL 解放を発生させないように改修  
 
-意外と多いですがゼロからコードを書くわけでもないので頑張ってみました。
+意外と多いですがゼロからコードを書くわけでもないので頑張ってみました。  
 永続的な利用でも無いですし Raspberry PI で ko のみメイクで  
 
 loading out-of-tree module taints kernel.
@@ -136,13 +137,15 @@ Raspberry PI 本体のシリアルは /dev/ttyAMA0 です。そのままでは T
 TTL レベルと RS-232C の電気的変換が必要です。十分に出来る場合は Makefile を
 以下のように変更して下さい。
 
-元
+元  
+
     install:
             cp snd-serialmidi.ko $(KERNEL_BASE)/sound/drivers
             depmod -a
             modprobe snd-serialmidi
 
-変更後
+変更後  
+
     install:
             cp snd-serialmidi.ko $(KERNEL_BASE)/sound/drivers
             depmod -a
