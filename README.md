@@ -165,7 +165,7 @@ taints kernel. は全無視で(笑)
     $ ls -al /dev/ttyUSB0
     crw-rw---- 1 root dialout 188, 0 Dec 25 21:33 /dev/ttyUSB0
 
-RTS / DTR の ON 確認は以下の画像でご了承下さい。
+RTS(RS) / DTR(ER) の ON 確認は以下の画像でご了承下さい。
 ![RTS-DTR確認](/img/P_20181223_202618.jpg)
 
 MIDI ポート確認  
