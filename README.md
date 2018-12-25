@@ -272,7 +272,7 @@ root ユーザの直下にインストールされている kernel ソースコ�
     # rm -fr linux
     # rm -f linux*.tar.gz
 
-久しぶりに聞いた外部 MIDI 音源での演奏は、とても良いですね。
+久しぶりに聞いた外部 MIDI 音源での演奏は、とても良いですね。  
 いろいろと思い出されます(YUI ネットとか PC-VAN sig とか FMIDI* とか compuserve とか)
 
 以上です。
