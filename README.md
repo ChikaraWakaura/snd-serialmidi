@@ -30,8 +30,8 @@ serialmidi.c が、ぽつんと取り残されてる(笑)
 
 発煙、発火の場合、落ち着いて直ちに電源を切りましょう。
 
-ハードによっては内部の SRAM バックアップにリチウムコイン電池を使用している物もあります。
-リチウムコイン電池は長年の温湿度変化により液漏れで基板に短絡回路を自然生成する事もあります。
+ハードによっては内部の SRAM バックアップにリチウムコイン電池を使用している物もあります。  
+リチウムコイン電池は長年の温湿度変化により液漏れで基板に短絡回路を自然生成する事もあります。  
 
 いろいろな虫が住み着いて卵を生んで(以下省略ｗ)
 
@@ -257,7 +257,8 @@ raveloxmidi ファイル指定実行
 
     $ raveloxmidi -N -c ~/.config/raveloxmidi-rsmidi.conf
 
-これで [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) が動作する環境より任意の MIDI 再生ソフトからの MIDI 再生が可能になり Raspberry PI 経由で外部 MIDI 音源へ MIDI 出力可能となります。
+これで [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) が動作する環境より任意の MIDI 再生ソフトからの MIDI 再生が可能になり Raspberry PI 経由で  
+外部 MIDI 音源へ MIDI 出力可能となります。
 
 残念なことに [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) は MIDI IN データをアプリケーションへ通知しなかったと思います。  
 受けてるけどアプリ側へ渡すロジックを実装忘れまたは事情により実装したくないだったような。  
