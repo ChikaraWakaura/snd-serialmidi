@@ -160,14 +160,16 @@ taints kernel. は全無視で(笑)
     $ dmesg
     [  114.594564] snd_serialmidi: loading out-of-tree module taints kernel.
 
-/dev/ttyUSB0 存在確認
+/dev/ttyUSB0 存在確認  
+
     $ ls -al /dev/ttyUSB0
     crw-rw---- 1 root dialout 188, 0 Dec 25 21:33 /dev/ttyUSB0
 
 RTS / DTR の ON 確認は以下の画像でご了承下さい。
 ![RTS-DTR確認](/img/P_20181223_202618.jpg)
 
-MIDI ポート確認
+MIDI ポート確認  
+
     $ amidi -l
     Dir Device    Name
     IO  hw:0,0    Serial MIDI [/dev/ttyUSB0] 0
@@ -182,10 +184,12 @@ MIDI ポート確認
      14:0    Midi Through                     Midi Through Port-0
      16:0    Serial MIDI                      Serial MIDI [/dev/ttyUSB0] 0
 
-再生確認(MIDI OUT)
+再生確認(MIDI OUT)  
+
     $ aplaymidi -p 16:0 hogehoge.midi
 
-記録確認(MIDI IN)
+記録確認(MIDI IN)  
+
     $ amidi -d -p hw:0,0
 
 上記待機状態になったら MIDI 機器からシステムエクスクルーシブダンプでも良いですし  
@@ -204,23 +208,28 @@ MIDI 音源経由で鍵盤を押して結果が表示されるか確認出来ま
 F5 01 後の全データは A 側を示し F5 02 後の全データは B 側という制御だったと
 思います。うろ覚えです。間違っていたらご指摘下さい。
 
-ロードされている ko があればアンロードします。
+ロードされている ko があればアンロードします。  
+
     $ sudo rmmod snd-serialmidi
 
-MIDI OUT を 2 つにしてロードします。
+MIDI OUT を 2 つにしてロードします。  
+
     $ sudo modprobe snd-serialmidi outs=2
 
-MIDI OUT が 2 つに増えます。
+MIDI OUT が 2 つに増えます。  
+
     $ aplaymidi -l
     Port    Client name                      Port name
      14:0    Midi Through                     Midi Through Port-0
      16:0    Serial MIDI                      Serial MIDI [/dev/ttyUSB0] 0-0
      16:1    Serial MIDI                      Serial MIDI [/dev/ttyUSB0] 0-1
 
-外部 MIDI 音源 A 側へ再生は以下です。
+外部 MIDI 音源 A 側へ再生は以下です。  
+
     $ playmidi -p 16:0 hogehoge.mid
 
-外部 MIDI 音源 B 側へ再生は以下です。
+外部 MIDI 音源 B 側へ再生は以下です。  
+
     $ playmidi -p 16:1 hogehoge.mid
 
 シーケンサソフトで 1 ～ 16 トラック(orパート)と 17 ～ 32 トラック(orパート)を  
