@@ -186,7 +186,7 @@ MIDI ポート確認
 
 再生確認(MIDI OUT)  
 
-    $ aplaymidi -p 16:0 hogehoge.midi
+    $ aplaymidi -p 16:0 hogehoge.mid
 
 記録確認(MIDI IN)  
 
