@@ -276,4 +276,8 @@ root ユーザの直下にインストールされている kernel ソースコ�
 久しぶりに聞いた外部 MIDI 音源での演奏は、とても良いですね。  
 いろいろと思い出されます(YUI ネットとか PC-VAN sig とか FMIDI* とか compuserve とか)
 
+# 9. 改訂
+
+2018/12/29 MIDI IN kthread が CPU 100% になる不具合改修
+
 以上です。
