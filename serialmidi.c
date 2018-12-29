@@ -148,7 +148,7 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 		set_bit(mode, &serial->mode);
 		goto __end;
 	}
-	if (IS_ERR(serial->file = filp_open(serial->sdev, O_RDWR, 0))) {
+	if (IS_ERR(serial->file = filp_open(serial->sdev, O_RDWR | O_NONBLOCK, 0))) {
 		retval = PTR_ERR(serial->file);
 		serial->file = NULL;
 		goto __end;
@@ -219,7 +219,7 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	ntermios->c_cc[VEOL] = 0; /* '\r'; */
 	ntermios->c_cc[VERASE] = 0;
 	ntermios->c_cc[VKILL] = 0;
-	ntermios->c_cc[VMIN] = 1;
+	ntermios->c_cc[VMIN] = 0;
 	ntermios->c_cc[VTIME] = 0;
 	driver->ops->set_termios(tty, &old_termios);
 	serial->tty = tty;
