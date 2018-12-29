@@ -278,6 +278,7 @@ root ユーザの直下にインストールされている kernel ソースコ�
 
 # 9. 改訂
 
-2018/12/29 MIDI IN kthread が CPU 100% になる不具合改修
+2018/12/29 MIDI IN kthread が CPU 100% になる不具合があります。一時的に O_NONBLOCK 無しでテストしましたが MIDI IN クローズ
+           不可になりました。そのため正しく改修できるまで O_NONBLOCK で公開です。
 
 以上です。
