@@ -30,6 +30,7 @@
 #include <linux/err.h>
 #include <linux/platform_device.h>
 #include <linux/slab.h>
+#include <linux/delay.h>
 #include <linux/tty.h>
 #include <linux/module.h>
 #include <linux/sched.h>
@@ -311,6 +312,8 @@ static int kthread_rx_main( void *arg )
 			count = ldisc->ops->read( tty, serial->file, rx_buf, RX_BUF_SIZE );
 			if ( count > 0 ) {
 				snd_rawmidi_receive( serial->substream_input, rx_buf, count );
+			} else {
+				msleep(1);
 			}
 		}
 		schedule();
