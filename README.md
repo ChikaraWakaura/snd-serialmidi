@@ -278,8 +278,10 @@ root ユーザの直下にインストールされている kernel ソースコ�
 
 # 9. 改訂
 
-2018/12/29 MIDI IN kthread が CPU 100% になる不具合改修として ldisc->ops->read() が 0 以下の場合 msleep(1) (1msec寝る) としました(笑)  
-正規な流れは O_NONBLOCK なし VMIN = 1 で filp_open 中の TTY へ signal 配送で ldisc->ops->read() 抜けと思いますがカーネルモジュール内で  
-別カーネルモジュールへの signal 配送手段が分かりません(泣)　ご存知の方は、ぜひ御教授または Pull Req をお願い致します。
+2018/12/29 MIDI IN kthread が CPU 100%  
+この不具合改修として ldisc->ops->read() が 0 以下の場合 msleep(1) (1msec寝る) としました(笑)  
+正規な流れは O_NONBLOCK なし VMIN = 1 で filp_open 中の TTY へ signal 配送で ldisc->ops->read()  
+抜けと思いますがカーネルモジュール内で別カーネルモジュールへの signal 配送手段が分かりません(泣)  
+ご存知の方は、ぜひ御教授または Pull Req をお願い致します。  
 
 以上です。
