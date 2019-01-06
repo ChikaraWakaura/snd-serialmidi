@@ -84,14 +84,14 @@ I found the following problem as a result of thorough reading.
 
 (1) Portability is low because magic code hacks architecture on tty side.  
 (2) The necessity of F5 NN seems to be understood at that time. It is not implemented.  
-(3) When IN or OUT port is set to 1 or more certainly ensure that close- tty () -> filp_close () causes serial-> file to be NULL  
+(3) When IN or OUT port is set to 1 or more certainly ensure that close_tty() ->filp_close() causes serial->file to be NULL  
 (4) Malfunction SERIAL_MODE_BIT_ * is not actually a bit value.  
-(5) kernel memory leak or NULL release line 428 if (serial-> sdev); (it is written last)  
+(5) kernel memory leak or NULL release line 428 if (serial->sdev); (it is written last)  
 
 Below, each measure and improvement method.
 
-(1) MIDI IN (serial reception) uses purely kthread and ldisc-> ops-> read ()  
-MIDI OUT (serial transmission) uses purely ldisc -> ops -> write ()  
+(1) MIDI IN (serial receive) uses purely kthread and ldisc->ops->read()  
+MIDI OUT (serial transmission) uses purely ldisc->ops->write()  
 (2) F5 NN implementation  
 (3) Refurbishment not to occur  
 (4) Bit value correctly Implementation and operation confirmation with no side effects  
