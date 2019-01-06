@@ -90,7 +90,7 @@ I found the following problem as a result of thorough reading.
 
 Below, each measure and improvement method.
 
-(1) MIDI IN (serial reception) uses purely kthread and ldisc-> ops-> read ()
+(1) MIDI IN (serial reception) uses purely kthread and ldisc-> ops-> read ()  
 MIDI OUT (serial transmission) uses purely ldisc -> ops -> write ()  
 (2) F5 NN implementation  
 (3) Refurbishment not to occur  
