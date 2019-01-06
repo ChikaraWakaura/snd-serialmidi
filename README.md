@@ -2,7 +2,7 @@
 
 It is a serial MIDI kernel driver (snd-serialmidi.ko) of /dev/tty* compatible with linux kernel 4.14.84. 
 
-# 2. Circumstances
+# 2. History of things
 
 The other day, I found a corrugated card box written as valuables from pushing in by choosing before the large cleaning at the end of 2018.
 Inside was Roland SC-88Pro, Yamaha MU15, D-SUB 9 MIDI sound source connection cable.
