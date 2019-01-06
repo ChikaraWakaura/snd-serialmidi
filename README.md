@@ -19,7 +19,7 @@ From there, the result that we walked forward is here (lol)
 
 # 3. Section of Hardware
 
-most important
+--- Warning ---   
 
 Please pay close attention to confirm the energization of past 100/220 V type hard (own past assets, second hand acquired etc).
 
