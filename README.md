@@ -17,7 +17,7 @@ Eh yeah yeah (lol) Why? (lol)
 
 From there, the result that we walked forward is here (lol) 
 
-# 3. Hard section
+# 3. Section of Hardware
 
 most important
 
@@ -58,7 +58,7 @@ I experimented with Raspberry PI 3 model B/FT232RL/pl2303 combination.
 
 ![実験全景YAMAHA-MU15-FT232RL](/img/P_20181223_180350.jpg)
 
-# 4. Software preparation
+# 4. Section of Software preparation
 
 In the final version of ALSA alone, doc/serialmidi.txt of [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/) had no written description of how linux kernel was not integrated.
 
@@ -106,7 +106,7 @@ It is not even a permanent use, and Raspberry PI makes ko only with makeup
 
 # 5. Operation check
 
-kernel ソースコード一式を必要とします。  
+I need a kernel source code set.
 
     $ sudo apt-get update
     $ sudo apt-get -y install ncurses-dev
@@ -115,49 +115,48 @@ kernel ソースコード一式を必要とします。
     $ sudo chmod +x /usr/bin/rpi-source
     $ sudo rpi-source --skip-gcc
 
-メイクと実行  
+Make and run  
 
     $ cd snd-serialmidi
     $ sudo make clean
     $ sudo make
     $ sudo make install
 
-Raspberry PI 本体のシリアルは /dev/ttyAMA0 です。そのままでは TTL レベルです。  
-TTL レベルと RS-232C の電気的変換が必要です。十分に出来る場合は Makefile を
-以下のように変更して下さい。
+The serial of the Raspberry PI is /dev/ttyAMA0. It is the TTL level as it is.
+Electrical conversion of TTL level and RS-232C is necessary. Please change Makefile as follows if it can do enough.
 
-元  
+original.
 
     install:
             cp snd-serialmidi.ko $(KERNEL_BASE)/sound/drivers
             depmod -a
             modprobe snd-serialmidi
 
-変更後  
+After change.
 
     install:
             cp snd-serialmidi.ko $(KERNEL_BASE)/sound/drivers
             depmod -a
             modprobe snd-serialmidi sdev=/dev/ttyAMA0
 
-外部 MIDI 音源 HOST スイッチ PC-2 確認、外部 MIDI 音源シリアルケーブル接続確認、  
-シリアルケーブルと USB シリアルコンバータの接続確認後、USB ポートへ差します。
+External MIDI sound source HOST switch PC-2 confirmation, external MIDI sound source Serial cable connection check,
+After confirming the connection of the serial cable and the USB serial converter, plug it into the USB port.
 
-dmesg または tail -5 /var/log/syslog で ko ロード確認が出来ます。  
-taints kernel. は全無視で(笑)
+You can check ko load in dmesg or tail -5 /var/log/syslog.
+Taints kernel. is all ignorant.
 
     $ dmesg
     [  114.594564] snd_serialmidi: loading out-of-tree module taints kernel.
 
-/dev/ttyUSB0 存在確認  
+/dev/ttyUSB0 existence confirmation.
 
     $ ls -al /dev/ttyUSB0
     crw-rw---- 1 root dialout 188, 0 Dec 25 21:33 /dev/ttyUSB0
 
-RTS(RS) / DTR(ER) の ON 確認は以下の画像でご了承下さい。
+Please confirm RTS (RS) / DTR (ER) ON check in the image below.
 ![RTS-DTR確認](/img/P_20181223_202618.jpg)
 
-MIDI ポート確認  
+MIDI port confirmation.
 
     $ amidi -l
     Dir Device    Name
@@ -173,16 +172,16 @@ MIDI ポート確認
      14:0    Midi Through                     Midi Through Port-0
      16:0    Serial MIDI                      Serial MIDI [/dev/ttyUSB0] 0
 
-再生確認(MIDI OUT)  
+Playback confirmation (MIDI OUT)
 
     $ aplaymidi -p 16:0 hogehoge.mid
 
-記録確認(MIDI IN)  
+Record confirmation (MIDI IN)
 
     $ amidi -d -p hw:0,0
 
-上記待機状態になったら MIDI 機器からシステムエクスクルーシブダンプでも良いですし  
-MIDI 音源経由で鍵盤を押して結果が表示されるか確認出来ます。
+When it comes to the standby state, you can use a system exclusive dump from a MIDI device.
+You can check whether the result is displayed by pressing the keyboard via MIDI sound source.
 
 # 6. Single external MIDI sound source A side / B side confirmation
 
