@@ -142,8 +142,8 @@ After change.
 External MIDI sound source HOST switch PC-2 confirmation, external MIDI sound source Serial cable connection check,
 After confirming the connection of the serial cable and the USB serial converter, plug it into the USB port.
 
-You can check ko load in dmesg or tail -5 /var/log/syslog.
-Taints kernel. is all ignorant.
+You can check ko load in dmesg or tail -5 /var/log/syslog.  
+Taints kernel. is all ignorant. (lol)
 
     $ dmesg
     [  114.594564] snd_serialmidi: loading out-of-tree module taints kernel.
