@@ -21,7 +21,7 @@ From there, the result that we walked forward is here (lol)
 
 --- Warning ---   
 
-Please pay close attention to confirm the energization of past 100/220 V type hard (own past assets, second hand acquired etc).
+Please pay close attention to confirm the energization of old hardware.
 
 In case of smoke or ignition, let's calm down and immediately turn off the power.
 
