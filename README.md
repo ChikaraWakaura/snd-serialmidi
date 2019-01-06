@@ -13,9 +13,9 @@ Raspberry PI should be able to do serial MIDI, and it is only snd-serial-u16550.
 
 I thought that there was an available ko for /dev/tty* and looking at the final version of ALSA alone [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/), it's in drivers/serialmidi.c has been left behind poorly (lol)
 
-Eh yeah yeah (lol) Why? (Laugh)
+Eh yeah yeah (lol) Why? (lol)
 
-From there, the result that we walked forward is here (laugh) 
+From there, the result that we walked forward is here (lol) 
 
 # 3. Hard section
 
@@ -28,10 +28,10 @@ In case of smoke or ignition, let's calm down and immediately turn off the power
 Some hardware uses lithium coin batteries for internal SRAM backup.
 Lithium coin batteries may spontaneously generate a short circuit on the board due to leakage due to long-term change in temperature and humidity.
 
-Various insects have settled and bred eggs (hereinafter abbreviated w)
+Various insects have settled and bred eggs... (lol)
 
 Well Roland SC-88 Pro and YAMAHA MU15 each have full view and electricity conduction check. Especially power supply did not interfere either way.
-Before energizing, we cleaned up the bulk, but there were no insect eggs, carcasses etc (laughter) 
+I cleaned up, but there were no insect eggs, dead bodies.
 
 ![全景YAMAHA-MU15](/img/P_20181223_174535.jpg)
 ![全景YAMAHA-MU15-AC](/img/P_20181223_174714.jpg)
