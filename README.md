@@ -239,7 +239,7 @@ In case of using [raveloxmidi](https://github.com/ravelox/pimidi/tree/master/rav
     Dir Device    Name
     IO  hw:0,0    Serial MIDI [/dev/ttyUSB0] 0
 
-Prepare the following file in ~ / .config.  
+Prepare the following file in ~/.config.  
 
     $ cat ~/.config/raveloxmidi-rsmidi.conf
     service.name = serial-midi
@@ -267,7 +267,7 @@ Delete the kernel source code set installed directly under the root user as nece
     # rm -f linux*.tar.gz
 
 The performance with an external MIDI sound source that I heard after a long time is very good, is not it?  
-I remember many things (YUI net, PC-VAN sig, FMIDI * or compuserve)  
+I remember many things (YUI net, PC-VAN sig, FMIDI* or compuserve)  
 
 # 9. Revision
 
