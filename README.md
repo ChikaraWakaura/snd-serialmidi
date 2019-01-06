@@ -4,41 +4,34 @@ It is a serial MIDI kernel driver (snd-serialmidi.ko) of /dev/tty* compatible wi
 
 # 2. Circumstances
 
-先日、2018年末大掃除前の取捨選択で貴重品と書かれたダンボール箱を押し入れから発見しました。  
-なかに Roland SC-88Pro , YAMAHA MU15 , D-SUB9 MIDI 音源接続ケーブルが入っていました。
+The other day, I found a corrugated card box written as valuables from pushing in by choosing before the large cleaning at the end of 2018.
+Inside was Roland SC-88Pro, Yamaha MU15, D-SUB 9 MIDI sound source connection cable.
 
-おおおお、懐かしい!!!  SC-88VL とか SC-55mkII とか YAMAHA MU-90 も買ったような記憶があるけど  
-ヤフオクに行っただろうか...
+Oh Oh, nostalgic !! There is a memory that I bought SC-88VL, SC-55mkII or YAMAHA MU-90, but I wonder if I went to Yahoo! Au ...
 
-Raspberry PI でもシリアル MIDI できるはずだし過去の記憶をたよりに /lib/module/ 以下をみても  
-シリアル MIDI ができそうなのは snd-serial-u16550.ko しかない。しかも IBM PC/AT 互換機向けの ko が  
-Raspberry PI に入ってるとは(笑)
+Raspberry PI should be able to do serial MIDI, and it is only snd-serial-u16550.ko that can make serial MIDI even if you look at /lib/module/ or less from past memory. Moreover, ko for IBM PC/AT compatible machine What is in Raspberry PI (laugh)
 
-/dev/tty* が利用可能な ko があったと思い ALSA 単独の最終版 [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/)
-をみると drivers/ に  
-serialmidi.c が、ぽつんと取り残されてる(笑)
+I thought that there was an available ko for /dev/tty* and looking at the final version of ALSA alone [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/), it's in drivers/serialmidi.c has been left behind poorly (lol)
 
-えええええ(笑)　どうして?(笑)
+Eh yeah yeah (lol) Why? (Laugh)
 
-そこから、じこじこ進めた結果がここです(笑)
+From there, the result that we walked forward is here (laugh) 
 
 # 3. Hard section
 
-最重要
+most important
 
-過去の 100 V 系ハード(自身の過去資産、中古取得品等)を通電確認するには細心の注意をはらって下さい。
+Please pay close attention to confirm the energization of past 100/220 V type hard (own past assets, second hand acquired etc).
 
-発煙、発火の場合、落ち着いて直ちに電源を切りましょう。
+In case of smoke or ignition, let's calm down and immediately turn off the power.
 
-ハードによっては内部の SRAM バックアップにリチウムコイン電池を使用している物もあります。  
-リチウムコイン電池は長年の温湿度変化により液漏れで基板に短絡回路を自然生成する事もあります。  
+Some hardware uses lithium coin batteries for internal SRAM backup.
+Lithium coin batteries may spontaneously generate a short circuit on the board due to leakage due to long-term change in temperature and humidity.
 
-いろいろな虫が住み着いて卵を生んで(以下省略ｗ)
+Various insects have settled and bred eggs (hereinafter abbreviated w)
 
-
-
-さて Roland SC-88Pro と YAMAHA MU15 のそれぞれ全景と通電確認です。特に支障なくどちらも通電しました。  
-通電前に、ばらし清掃しましたが虫の卵、死骸等はありませんでした(爆笑)
+Well Roland SC-88 Pro and YAMAHA MU15 each have full view and electricity conduction check. Especially power supply did not interfere either way.
+Before energizing, we cleaned up the bulk, but there were no insect eggs, carcasses etc (laughter) 
 
 ![全景YAMAHA-MU15](/img/P_20181223_174535.jpg)
 ![全景YAMAHA-MU15-AC](/img/P_20181223_174714.jpg)
@@ -48,21 +41,17 @@ serialmidi.c が、ぽつんと取り残されてる(笑)
 ![背面Roland-SC-88Pro](/img/P_20181223_175249.jpg)
 ![通電Roland-SC-88Pro](/img/P_20181223_175613.jpg)
 
-正規の MIDI は 31.25 kbps です。クロック分周の影響で誤差 1 % に収まらない H/W が当時多々  
-ありました。その対策に外部 MIDI 音源には 38.4 kbps (HOST PC-2)の機能が組み込まれて行きました。
+Regular MIDI is 31.25 kbps. At the time there were many H/W which did not fit within 1% of error due to clock division. To that effect, the function of 38.4 kbps (HOST PC-2) was installed in the external MIDI sound source.
 
-HOST PC-1(NEC PC-9800シリーズ等) は 31.25 kbps。音源側のコネクタ形状を見てピンと来る方には  
-分かると思います。当時の MAC は RS-422/425 でしたね。無理矢理逆差ししてピン潰し事件も多々ありました。  
-と言うことで MIDI/PC-1/PC-2/MAC な HOST スイッチ実装機は RS-232C/422/425 が出来て 31.25 kbps と  
-38.4 kbps ができるマルチシリアルコントローラが内蔵されていると考えられますね。
+HOST PC-1 (NEC PC-9800 series etc.) is 31.25 kbps. I think that it is understood to the person who comes with the pin looking at the shape of the connector on the sound source side. At that time the MAC was RS-422/425. There was also a lot of incidents involving crushing pins by forcing them backwards.
+By saying that MIDI/PC-1/PC-2/MAC HOST switch mounter is RS-232C/422/425 made 31.25 kbps with It seems that a multi-serial controller capable of 38.4 kbps is built in.
 
-民生用途な USB シリアルコンバータは 38.4k bps が当然出来ますので外部 MIDI 音源を USB シリアルコンバータ  
-経由する場合には HOST スイッチは PC-2 で利用します。
+For consumer-oriented USB serial converter, 38.4 k bps is of course possible, so when using an external MIDI sound source via a USB serial converter, use the HOST switch with PC-2.
 
-HOST スイッチが実装されていないもっと古いハードは DIN コネクタと SHARP PC-900 等で H/W 組んで 31.25 kbps と  
-38.4 kbps の PIC ブリッジでも用意しましょう(笑)
+HOST switch is not installed Older hardware is 31.25 kbps with H/W combination with DIN connector and SHARP PC-900 etc.
+Let's prepare even 38.4 kbps PIC bridge (lol)
 
-小生は Raspberry PI 3 model B / FT232RL / pl2303 の組み合わせで実験しました。  
+I experimented with Raspberry PI 3 model B/FT232RL/pl2303 combination.
 
    $ uname -a  
    Linux raspi-002 4.14.84-v7+ #1169 SMP Thu Nov 29 16:20:43 GMT 2018 armv7l GNU/Linux  
