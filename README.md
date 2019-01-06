@@ -172,11 +172,11 @@ MIDI port confirmation.
      14:0    Midi Through                     Midi Through Port-0
      16:0    Serial MIDI                      Serial MIDI [/dev/ttyUSB0] 0
 
-Playback confirmation (MIDI OUT)
+Playback(MIDI OUT) confirmation.
 
     $ aplaymidi -p 16:0 hogehoge.mid
 
-Record confirmation (MIDI IN)
+Record(MIDI IN) confirmation.
 
     $ amidi -d -p hw:0,0
 
@@ -185,27 +185,27 @@ You can check whether the result is displayed by pressing the keyboard via MIDI 
 
 # 6. Single external MIDI sound source A side / B side confirmation
 
-外部 MIDI 音源には 16 トラック(orパート)を 2 セット持っているハードもありました。  
-外部 MIDI 音源の ALL ボタンを押すと液晶表示に横線が入り上 B 側 / 下 A 側と見ていました。
+There were also hards that have 2 sets of 16 tracks (or parts) as external MIDI sound sources.  
+When you pressed the ALL button of the external MIDI sound source, the horizontal line entered the liquid crystal display and I saw it as B side / lower A side.  
 
 ![ALL表示](/img/P_20190105_111236.jpg)
 
-背面 DIN コネクタの MIDI IN A/B と連動してます。
+It is linked with MIDI IN A/B on the rear DIN connector.
 
-これをシリアルで制御する手段として F5 NN が規定されたと記憶しています。
+I remember that F5 NN was specified as a means to control this serially.
 
-F5 01 後の全データは A 側を示し F5 02 後の全データは B 側という制御だったと思います。  
-うろ覚えです。間違っていたらご指摘下さい。
+I think that all data after F5 01 was control on A side and all data after F5 02 was control on B side.  
+It is foolish. Please point out if it is wrong.
 
-ロードされている ko があればアンロードします。  
+Unload the loaded ko if it exists.
 
     $ sudo rmmod snd-serialmidi
 
-MIDI OUT を 2 つにしてロードします。  
+Load it with 2 MIDI OUT.
 
     $ sudo modprobe snd-serialmidi outs=2
 
-MIDI OUT が 2 つに増えます。  
+MIDI OUT will be increased to 2.
 
     $ aplaymidi -l
     Port    Client name                      Port name
@@ -213,34 +213,33 @@ MIDI OUT が 2 つに増えます。
      16:0    Serial MIDI                      Serial MIDI [/dev/ttyUSB0] 0-0
      16:1    Serial MIDI                      Serial MIDI [/dev/ttyUSB0] 0-1
 
-外部 MIDI 音源 A 側へ再生は以下です。  
+Playback to the external MIDI sound source A side is below.  
 
     $ playmidi -p 16:0 hogehoge.mid
 
-以下、再生画像です。曲名は放置で(笑)
+Below is the playback image. 
 ![A側再生](/img/P_20190105_112432.jpg)
 
-外部 MIDI 音源 B 側へ再生は以下です。  
+Playback to the external MIDI sound source B side is below.  
 
     $ playmidi -p 16:1 hogehoge.mid
 
-以下、再生画像です。曲名は放置で(笑)
+Below is the playback image. 
 ![B側再生](/img/P_20190105_112654.jpg)
 
-シーケンサソフトで 1 ～ 16 トラック(orパート)と 17 ～ 32 トラック(orパート)を  
-個別に MIDI OUT ポート出力定義できる場合は 32 トラック(orパート)再生が可能になります。
+If you can define MIDI OUT port output separately for 1 to 16 tracks (or parts) and 17 to 32 tracks (or parts) with the sequencer software, 32 tracks (or part) playback becomes possible.
 
-記憶にある rosegarden は出来なかったような...　確認不足しています(笑)
+It seems like rosegarden in memory could not be done... lacking confirmation (lol) 
 
-# 7. Advanced version
+# 7. take advantage of
 
-[raveloxmidi](https://github.com/ravelox/pimidi/tree/master/raveloxmidi) & [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) 利用の場合は以下のようになります。
+In case of using [raveloxmidi](https://github.com/ravelox/pimidi/tree/master/raveloxmidi) & [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) , it becomes as follows.  
 
     $ amidi -l
     Dir Device    Name
     IO  hw:0,0    Serial MIDI [/dev/ttyUSB0] 0
 
-以下のようなファイルを ~/.config に準備します。
+Prepare the following file in ~ / .config.  
 
     $ cat ~/.config/raveloxmidi-rsmidi.conf
     service.name = serial-midi
@@ -249,34 +248,32 @@ MIDI OUT が 2 つに増えます。
     alsa.input_device = hw:0,0,0
     alsa.output_device = hw:0,0,0
 
-raveloxmidi ファイル指定実行
+Run designation of raveloxmidi file  
 
     $ raveloxmidi -N -c ~/.config/raveloxmidi-rsmidi.conf
 
-これで [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) が動作する環境より任意の MIDI 再生ソフトからの MIDI 再生が可能になり Raspberry PI 経由で  
-外部 MIDI 音源へ MIDI 出力可能となります。
+With this, MIDI playback from any MIDI playback software becomes possible from the environment where [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) operates, and it becomes MIDI output to the external MIDI sound source via Raspberry PI.
 
-残念なことに [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) は MIDI IN データをアプリケーションへ通知しなかったと思います。  
-受けてるけどアプリ側へ渡すロジックを実装忘れまたは事情により実装したくないだったような。  
-うろ覚えです。間違っていたらご指摘下さい。
+Unfortunately I think that [rtpMIDI](https://www.tobias-erichsen.de/software/rtpmidi.html) did not notify MIDI IN data to the application.  
+I'm receiving it but I do not want to implement the logic that I handed over to the application side due to forgetting implementation or circumstances.  
+It is foolish. Please point out if it is wrong.
 
 # 8. Other
 
-root ユーザの直下にインストールされている kernel ソースコード一式は必要に応じて削除して下さい。  
+Delete the kernel source code set installed directly under the root user as necessary.
 
     $ su -
     # rm -fr linux
     # rm -f linux*.tar.gz
 
-久しぶりに聞いた外部 MIDI 音源での演奏は、とても良いですね。  
-いろいろと思い出されます(YUI ネットとか PC-VAN sig とか FMIDI* とか compuserve とか)
+The performance with an external MIDI sound source that I heard after a long time is very good, is not it?  
+I remember many things (YUI net, PC-VAN sig, FMIDI * or compuserve)  
 
 # 9. Revision
 
-2018/12/29 MIDI IN kthread が CPU 100%  
-この不具合改修として ldisc->ops->read() が 0 以下の場合 msleep(1) (1msec寝る) としました(笑)  
-正規な流れは O_NONBLOCK なし VMIN = 1 で filp_open 中の TTY へ signal 配送で ldisc->ops->read()  
-抜けと思いますがカーネルモジュール内で別カーネルモジュールへの signal 配送手段が分かりません(泣)  
-ご存知の方は、ぜひ御教授または Pull Req をお願い致します。  
+Dec/29/2018 MIDI IN kthread is CPU 100%  
+As this bug repair msleep(1) (sleep 1 msec) if ldisc->ops->read() is less than 0.  
+Regular flow is O_NONBLOCK Without VMIN = 1 to TTY in filp_open ldisc->ops->read() with signal delivery I think that it is missing but I do not know the signal delivery method to another kernel module in the kernel module.  
+Those who knows, please give me Professor or Pull Req.
 
-以上です。
+that's all.
