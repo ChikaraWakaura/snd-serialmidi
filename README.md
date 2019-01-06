@@ -60,11 +60,11 @@ I experimented with Raspberry PI 3 model B/FT232RL/pl2303 combination.
 
 # 4. Software preparation
 
-ALSA 単独の最終版 [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/) の doc/serialmidi.txt には linux kernel 統合されなかった経緯は何も書かれていませんでした。
+In the final version of ALSA alone, doc/serialmidi.txt of [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/) had no written description of how linux kernel was not integrated.
 
-残された drivers/serialmidi.c を読むしかありません...  
+I have no choice but to read the remaining drivers / serialmidi.c ...
 
-読んでて、もっとも気になったところが以下です。
+The place I read most, which I read, is below.
 
     234         /* some magic here, we need own receive_buf */
     235         /* it would be probably better to create own line discipline */
@@ -75,35 +75,34 @@ ALSA 単独の最終版 [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.or
     240         serial->old_write_wakeup = tty->ldisc.write_wakeup;
     241         tty->ldisc.write_wakeup = ldisc_write_wakeup;
 
-tty 側の ldisc_data ポインタに自身のデータポインタを埋めて tty 側の receive_buf 関数へのポインタを自身側に差し替えて  
-tty 側の write_wakeup 関数へのポインタを自身側に差し替えいるところです。 
-こんな魔法なようなコードが(笑)
+fills its own data pointer in the ldisc_data pointer on the tty side and replaces the pointer to the receive_buf function on the tty side to itself
+We are replacing the pointer to the write_wakeup function on the tty side to itself. Such a magical code!
 
-これは統合拒否される原因かもですね
+This may be the cause of unification refusal.
 
-じっくり読んだ結果以下の問題がわかりました。
+I found the following problem as a result of thorough reading.
 
-(1) magic なコードは tty 側のアーキテクチャをハックしているので移植性が低い  
-(2) MIDI : F5 NN の必要性は、当時ご理解されているみたい。実装はされていない  
-(3) IN or OUT ポートを 1 以上にした場合に確実に close_tty() -> filp_close() で serial->file が NULL  
-(4) 誤作動 SERIAL_MODE_BIT_* が実はビット値になっていない  
-(5) カーネルメモリリーク or NULL 解放 428 行目 if (serial->sdev); となっている( ; が最後に書かれている)  
+(1) Portability is low because magic code hacks architecture on tty side.
+(2) The necessity of F5 NN seems to be understood at that time. It is not implemented.
+(3) When IN or OUT port is set to 1 or more certainly ensure that close- tty () -> filp_close () causes serial-> file to be NULL
+(4) Malfunction SERIAL_MODE_BIT_ * is not actually a bit value.
+(5) kernel memory leak or NULL release line 428 if (serial-> sdev); (it is written last)
 
-以下、各対策と改善方法です。
+Below, each measure and improvement method.
 
-(1) MIDI IN(シリアル受信)は純粋に kthread と ldisc->ops->read() を使用し、  
-    MIDI OUT(シリアル送信)は純粋に ldisc->ops->write() を使用  
-(2) F5 NN 実装  
-(3) 発生しないように改修  
-(4) ビット値を正しく実装と副作用なし視点での動作確認  
-(5) カーネルメモリリーク or NULL 解放を発生させないように改修  
+(1) MIDI IN (serial reception) uses purely kthread and ldisc-> ops-> read ()
+MIDI OUT (serial transmission) uses purely ldisc -> ops -> write ()
+(2) F5 NN implementation
+(3) Refurbishment not to occur
+(4) Bit value correctly Implementation and operation confirmation with no side effects
+(5) Refurbish not to cause kernel memory leak or NULL release
 
-意外と多いですがゼロからコードを書くわけでもないので頑張ってみました。  
-永続的な利用でも無いですし Raspberry PI で ko のみメイクで  
+Although it is surprisingly many, I tried hard because I do not write codes from scratch.
+It is not even a permanent use, and Raspberry PI makes ko only with makeup
 
-loading out-of-tree module taints kernel.
+    loading out-of-tree module taints kernel.
 
-↑は無視でいいかと。なんと言ってもレガシーすぎる外部 MIDI 音源ですし(笑)  
+↑ can be ignored. It is an external MIDI sound source that is too legacy to say anything.
 
 # 5. Operation check
 
