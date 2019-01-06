@@ -229,7 +229,7 @@ Below is the playback image.
 
 If you can define MIDI OUT port output separately for 1 to 16 tracks (or parts) and 17 to 32 tracks (or parts) with the sequencer software, 32 tracks (or part) playback becomes possible.
 
-It seems like rosegarden in memory could not be done... lacking confirmation (lol) 
+It seems like [rosegarden](https://www.rosegardenmusic.com/) in memory could not be done... lacking confirmation (lol) 
 
 # 7. take advantage of
 
