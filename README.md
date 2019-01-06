@@ -62,7 +62,7 @@ I experimented with Raspberry PI 3 model B/FT232RL/pl2303 combination.
 
 In the final version of ALSA alone, doc/serialmidi.txt of [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/) had no written description of how linux kernel was not integrated.
 
-I have no choice but to read the remaining drivers / serialmidi.c ...
+I have no choice but to read the remaining drivers/serialmidi.c ...
 
 The place I read most, which I read, is below.
 
