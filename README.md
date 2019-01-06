@@ -51,10 +51,10 @@ For consumer-oriented USB serial converter, 38.4 k bps is of course possible, so
 HOST switch is not installed Older hardware is 31.25 kbps with H/W combination with DIN connector and SHARP PC-900 etc.
 Let's prepare even 38.4 kbps PIC bridge (lol)
 
-I experimented with Raspberry PI 3 model B/FT232RL/pl2303 combination.
+I experimented with Raspberry PI 3 model B/FT232RL/pl2303 combination.  
 
-   $ uname -a  
-   Linux raspi-002 4.14.84-v7+ #1169 SMP Thu Nov 29 16:20:43 GMT 2018 armv7l GNU/Linux  
+    $ uname -a  
+    Linux raspi-002 4.14.84-v7+ #1169 SMP Thu Nov 29 16:20:43 GMT 2018 armv7l GNU/Linux  
 
 ![実験全景YAMAHA-MU15-FT232RL](/img/P_20181223_180350.jpg)
 
