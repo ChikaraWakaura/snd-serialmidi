@@ -9,7 +9,7 @@ Inside was Roland SC-88Pro, Yamaha MU15, D-SUB 9 MIDI sound source connection ca
 
 Oh Oh, nostalgic !! There is a memory that I bought SC-88VL, SC-55mkII or YAMAHA MU-90, but I wonder if I went to Yahoo! Au ...
 
-Raspberry PI should be able to do serial MIDI, and it is only snd-serial-u16550.ko that can make serial MIDI even if you look at /lib/module/ or less from past memory. Moreover, ko for IBM PC/AT compatible machine What is in Raspberry PI (laugh)
+Raspberry PI should be able to do serial MIDI, and it is only snd-serial-u16550.ko that can make serial MIDI even if you look at /lib/module/ or less from past memory. Moreover, ko for IBM PC/AT compatible machine What is in Raspberry PI (lol)
 
 I thought that there was an available ko for /dev/tty* and looking at the final version of ALSA alone [alsa-driver-1.0.25.tar.bz2](http://www.mirrorservice.org/sites/ftp.alsa-project.org/pub/driver/), it's in drivers/serialmidi.c has been left behind poorly (lol)
 
@@ -271,9 +271,10 @@ I remember many things (YUI net, PC-VAN sig, FMIDI * or compuserve)
 
 # 9. Revision
 
-Dec/29/2018 MIDI IN kthread is CPU 100%  
+Dec/29/2018 : MIDI IN kthread is CPU 100%  
 As this bug repair msleep(1) (sleep 1 msec) if ldisc->ops->read() is less than 0.  
-Regular flow is O_NONBLOCK Without VMIN = 1 to TTY in filp_open ldisc->ops->read() with signal delivery I think that it is missing but I do not know the signal delivery method to another kernel module in the kernel module.  
+Regular flow is O_NONBLOCK Without VMIN = 1 to TTY in filp_open ldisc->ops->read() with signal delivery.
+I think that it is missing but I do not know the signal delivery method to another kernel module in the kernel module.  
 Those who knows, please give me Professor or Pull Req.
 
 that's all.
