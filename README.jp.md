@@ -1,6 +1,6 @@
 # 1. 概要
 
-linux kernel 4.14.84 対応の /dev/tty* のシリアル MIDI カーネルドライバ(snd-serialmidi.ko)です。
+linux kernel 4.19.57 対応の /dev/tty* のシリアル MIDI カーネルドライバ(snd-serialmidi.ko)です。
 
 # 2. 経緯
 
@@ -64,8 +64,8 @@ HOST スイッチが実装されていないもっと古いハードは DIN コ�
 
 小生は Raspberry PI 3 model B / FT232RL / pl2303 の組み合わせで実験しました。  
 
-   $ uname -a  
-   Linux raspi-002 4.14.84-v7+ #1169 SMP Thu Nov 29 16:20:43 GMT 2018 armv7l GNU/Linux  
+   $ uname -a
+   Linux raspi-004 4.19.57+ #1244 Thu Jul 4 18:42:50 BST 2019 armv6l GNU/Linux 
 
 ![実験全景YAMAHA-MU15-FT232RL](/img/P_20181223_180350.jpg)
 
@@ -125,7 +125,8 @@ kernel ソースコード一式を必要とします。
     $ sudo apt-get -y install bc
     $ sudo wget https://raw.githubusercontent.com/notro/rpi-source/master/rpi-source -O /usr/bin/rpi-source
     $ sudo chmod +x /usr/bin/rpi-source
-    $ sudo rpi-source --skip-gcc
+    $ sudo rpi-source --tag-update
+    $ sudo rpi-source --skip-gcc --default-config
 
 メイクと実行  
 
