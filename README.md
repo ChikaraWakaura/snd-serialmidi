@@ -1,6 +1,6 @@
 # 1. Overview
 
-It is a serial MIDI kernel driver (snd-serialmidi.ko) of /dev/tty* compatible with linux kernel 4.14.84. 
+It is a serial MIDI kernel driver (snd-serialmidi.ko) of /dev/tty* compatible with linux kernel 4.19.57. 
 
 # 2. History of things
 
@@ -54,7 +54,7 @@ Let's prepare even 38.4 kbps PIC bridge (lol)
 I experimented with Raspberry PI 3 model B/FT232RL/pl2303 combination.  
 
     $ uname -a  
-    Linux raspi-002 4.14.84-v7+ #1169 SMP Thu Nov 29 16:20:43 GMT 2018 armv7l GNU/Linux  
+    Linux raspi-004 4.19.57+ #1244 Thu Jul 4 18:42:50 BST 2019 armv6l GNU/Linux
 
 ![実験全景YAMAHA-MU15-FT232RL](/img/P_20181223_180350.jpg)
 
@@ -113,7 +113,8 @@ I need a kernel source code set.
     $ sudo apt-get -y install bc
     $ sudo wget https://raw.githubusercontent.com/notro/rpi-source/master/rpi-source -O /usr/bin/rpi-source
     $ sudo chmod +x /usr/bin/rpi-source
-    $ sudo rpi-source --skip-gcc
+    $ sudo rpi-source --tag-update
+    $ sudo rpi-source --skip-gcc --default-config
 
 Make and run  
 
