@@ -129,7 +129,7 @@ static int ioctl_tty(struct file *file, unsigned int cmd, unsigned long arg)
 	if (file->f_op->unlocked_ioctl == NULL)
 		return -ENXIO;
 	fs = get_fs();
-	set_fs(get_ds());
+	set_fs(KERNEL_DS);
 	retval = file->f_op->unlocked_ioctl(file, cmd, arg);
 	set_fs(fs);
 	return retval;
