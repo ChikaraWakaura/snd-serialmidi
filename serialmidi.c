@@ -297,7 +297,9 @@ static int kthread_rx_main( void *arg )
 	struct tty_struct *tty;
 	struct tty_ldisc *ldisc;
 	unsigned char *rx_buf;
-	int count;
+    void *cookie;
+    unsigned long offset, size;
+	unsigned long count;
 
 	if ( serial == NULL )
 		return 0;
@@ -309,12 +311,24 @@ static int kthread_rx_main( void *arg )
 	while ( !kthread_should_stop() )
 	{
 		if (test_bit(SERIAL_MODE_BIT_INPUT_TRIGGERED, &serial->mode)) {
-			count = ldisc->ops->read( tty, serial->file, rx_buf, RX_BUF_SIZE );
-			if ( count > 0 ) {
-				snd_rawmidi_receive( serial->substream_input, rx_buf, count );
-			} else {
-				msleep(1);
-			}
+            cookie = NULL;
+            offset = 0;
+            do {
+              size = RX_BUF_SIZE - offset;
+              if (size <= 0) {
+                // make one more call to read with size = 0 to allow the ldisc to clear up the cookie.
+                size = 0;
+                printk(KERN_ERR "snd-serial ran out of space");
+              }
+              count = ldisc->ops->read( tty, serial->file, rx_buf + offset, size, &cookie, offset);
+              offset += count;
+              if ( count > 0 ) {
+                snd_rawmidi_receive( serial->substream_input, rx_buf, count );
+              } else {
+                msleep(1);
+                break;
+              }
+            } while(cookie);
 		}
 		schedule();
 	}
@@ -407,7 +421,7 @@ static int snd_serialmidi_input_open(struct snd_rawmidi_substream * substream)
 	serialmidi_t *serial = substream->rmidi->private_data;
 	int err;
 
-	if ((err = open_tty(serial, SERIAL_MODE_BIT_INPUT)) < 0)
+    if ((err = open_tty(serial, SERIAL_MODE_BIT_INPUT)) < 0)
 		return err;
 	serial->kthread_rx = kthread_run( kthread_rx_main, serial,
 					  "%s %d", serial->card->shortname, serial->dev_idx );
