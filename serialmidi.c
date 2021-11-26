@@ -298,7 +298,7 @@ static int kthread_rx_main( void *arg )
 	struct tty_ldisc *ldisc;
 	unsigned char *rx_buf;
     void *cookie;
-    unsigned long offset, size;
+    unsigned long offset;
 	unsigned long count;
 
 	if ( serial == NULL )
@@ -314,13 +314,7 @@ static int kthread_rx_main( void *arg )
             cookie = NULL;
             offset = 0;
             do {
-              size = RX_BUF_SIZE - offset;
-              if (size <= 0) {
-                // make one more call to read with size = 0 to allow the ldisc to clear up the cookie.
-                size = 0;
-                printk(KERN_ERR "snd-serial ran out of space");
-              }
-              count = ldisc->ops->read( tty, serial->file, rx_buf + offset, size, &cookie, offset);
+              count = ldisc->ops->read( tty, serial->file, rx_buf, RX_BUF_SIZE, &cookie, offset);
               offset += count;
               if ( count > 0 ) {
                 snd_rawmidi_receive( serial->substream_input, rx_buf, count );
