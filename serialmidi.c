@@ -35,6 +35,7 @@
 #include <linux/module.h>
 #include <linux/sched.h>
 #include <linux/kthread.h>
+#include <linux/version.h>
 #include <sound/core.h>
 #include <sound/rawmidi.h>
 #include <sound/initval.h>
@@ -53,7 +54,7 @@
 MODULE_AUTHOR("Jaroslav Kysela <perex@suse.cz>");
 MODULE_DESCRIPTION("Serial MIDI");
 MODULE_LICENSE("GPL");
-MODULE_SUPPORTED_DEVICE("{{ALSA, MIDI serial tty}}");
+// MODULE_SUPPORTED_DEVICE("{{ALSA, MIDI serial tty}}");
 
 static int index[SNDRV_CARDS] = SNDRV_DEFAULT_IDX;		/* Index 0-MAX */
 static char *id[SNDRV_CARDS] = SNDRV_DEFAULT_STR;		/* ID for this card */
@@ -110,7 +111,7 @@ typedef struct _snd_serialmidi {
 	struct mutex F5lock;
 	struct task_struct *kthread_rx;
 	int old_exclusive;
-	int old_low_latency;
+	// int old_low_latency;
 	unsigned char *tx_buf;
 	unsigned char *rx_buf;
 	int open_tty_call_cnt;
@@ -128,10 +129,18 @@ static int ioctl_tty(struct file *file, unsigned int cmd, unsigned long arg)
 		return -ENXIO;
 	if (file->f_op->unlocked_ioctl == NULL)
 		return -ENXIO;
-	fs = get_fs();
-	set_fs(KERNEL_DS);
+    #if LINUX_VERSION_CODE < KERNEL_VERSION(5,10,0)
+	    fs = get_fs();
+    	set_fs(KERNEL_DS);
+    #else
+        fs = force_uaccess_begin();    
+    #endif
 	retval = file->f_op->unlocked_ioctl(file, cmd, arg);
-	set_fs(fs);
+    #if LINUX_VERSION_CODE < KERNEL_VERSION(5,10,0)
+	    set_fs(fs);
+    #else
+        force_uaccess_end(fs);
+    #endif
 	return retval;
 }
 
@@ -240,9 +249,9 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 		goto __end;
 	}
 
-	serial->old_low_latency = tty->port->low_latency;
+	// serial->old_low_latency = tty->port->low_latency;
 	serial->old_exclusive = test_bit(TTY_EXCLUSIVE, &tty->flags);
-	tty->port->low_latency = 1;
+	// tty->port->low_latency = 1;
 	set_bit(TTY_EXCLUSIVE, &tty->flags);
 
 	set_bit(mode, &serial->mode);
@@ -274,7 +283,7 @@ static int close_tty(serialmidi_t *serial, unsigned long mode)
 
 	tty = serial->tty;
 	if (tty) {
-		tty->port->low_latency = serial->old_low_latency;
+		// tty->port->low_latency = serial->old_low_latency;
 		if (serial->old_exclusive)
 			set_bit(TTY_EXCLUSIVE, &tty->flags);
 		else
