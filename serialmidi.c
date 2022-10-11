@@ -120,6 +120,7 @@ typedef struct _snd_serialmidi {
 
 static struct platform_device *devptrs[SNDRV_CARDS];
 
+#ifdef CONFIG_SET_FS
 static int ioctl_tty(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	mm_segment_t fs;
@@ -143,6 +144,7 @@ static int ioctl_tty(struct file *file, unsigned int cmd, unsigned long arg)
     #endif
 	return retval;
 }
+#endif  // CONFIG_SET_FS
 
 static int open_tty(serialmidi_t *serial, unsigned long mode)
 {
@@ -151,7 +153,10 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	struct tty_struct *tty = NULL;
 	struct ktermios old_termios, *ntermios;
 	struct tty_driver *driver;
-	int ldisc, speed, cflag, mstatus;
+#ifdef CONFIG_SET_FS
+	int ldisc;
+#endif
+    int speed, cflag, mstatus;
 
 	mutex_lock(&serial->open_lock);
 	if (serial->tty) {
@@ -191,11 +196,15 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	}
 
 	/* select N_TTY line discipline (for sure) */
+#ifdef CONFIG_SET_FS
 	ldisc = N_TTY;
 	if ((retval = ioctl_tty(serial->file, TIOCSETD, (unsigned long)&ldisc)) < 0) {
 		snd_printk(KERN_ERR "TIOCSETD (N_TTY) failed for tty %s\n", serial->sdev);
 		goto __end;
 	}
+#else
+    tty_set_ldisc(tty, N_TTY);
+#endif
 
 	switch (serial->speed) {
 	case 9600:
@@ -234,20 +243,31 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	driver->ops->set_termios(tty, &old_termios);
 	serial->tty = tty;
 
+#ifdef CONFIG_SET_FS
 	if ((retval = ioctl_tty(serial->file, TIOCMGET, (unsigned long)&mstatus)) < 0) {
 		snd_printk(KERN_ERR "TIOCMGET failed for tty %s\n", serial->sdev);
 		goto __end;
 	}
+#else
+	mstatus = tty->ops->tiocmget(tty);
+#endif
 
 	/* DTR , RTS , LE ON */
 	mstatus |= TIOCM_DTR;
 	mstatus |= TIOCM_RTS;
 	mstatus |= TIOCM_LE;
 
+#ifdef CONFIG_SET_FS
 	if ((retval = ioctl_tty(serial->file, TIOCMSET, (unsigned long)&mstatus)) < 0) {
-		snd_printk(KERN_ERR "TIOCMSET failed for tty %s\n", serial->sdev);
+		snd_printk(KERN_ERR "TIOCMSET failed for tty %s errno %d\n", serial->sdev, retval);
 		goto __end;
 	}
+#else
+    if ((retval = tty->ops->tiocmset(tty, TIOCM_DTR | TIOCM_RTS | TIOCM_LE, 0)) != 0) {
+		snd_printk(KERN_ERR "TIOCMSET failed for tty %s errno %d\n", serial->sdev, retval);
+		goto __end;
+	}
+#endif
 
 	// serial->old_low_latency = tty->port->low_latency;
 	serial->old_exclusive = test_bit(TTY_EXCLUSIVE, &tty->flags);
@@ -256,6 +276,8 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 
 	set_bit(mode, &serial->mode);
 	retval = 0;
+
+    snd_printk(KERN_INFO"snd-serialmidi loaded %s\n", serial->sdev);
 
       __end:
       	if (retval < 0) {
