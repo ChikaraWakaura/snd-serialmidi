@@ -173,7 +173,7 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	if ( tty_fp )
 		tty = tty_fp->tty;
 
-	if (tty == NULL || tty->magic != TTY_MAGIC) {
+	if (tty == NULL) {
 		snd_printk(KERN_ERR "device %s has not valid tty\n", serial->sdev);
 		retval = -EIO;
 		goto __end;
