@@ -35,6 +35,7 @@
 #include <linux/module.h>
 #include <linux/sched.h>
 #include <linux/kthread.h>
+#include <linux/version.h>
 #include <sound/core.h>
 #include <sound/rawmidi.h>
 #include <sound/initval.h>
@@ -53,7 +54,7 @@
 MODULE_AUTHOR("Jaroslav Kysela <perex@suse.cz>");
 MODULE_DESCRIPTION("Serial MIDI");
 MODULE_LICENSE("GPL");
-MODULE_SUPPORTED_DEVICE("{{ALSA, MIDI serial tty}}");
+// MODULE_SUPPORTED_DEVICE("{{ALSA, MIDI serial tty}}");
 
 static int index[SNDRV_CARDS] = SNDRV_DEFAULT_IDX;		/* Index 0-MAX */
 static char *id[SNDRV_CARDS] = SNDRV_DEFAULT_STR;		/* ID for this card */
@@ -110,7 +111,7 @@ typedef struct _snd_serialmidi {
 	struct mutex F5lock;
 	struct task_struct *kthread_rx;
 	int old_exclusive;
-	int old_low_latency;
+	// int old_low_latency;
 	unsigned char *tx_buf;
 	unsigned char *rx_buf;
 	int open_tty_call_cnt;
@@ -119,6 +120,7 @@ typedef struct _snd_serialmidi {
 
 static struct platform_device *devptrs[SNDRV_CARDS];
 
+#ifdef CONFIG_SET_FS
 static int ioctl_tty(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	mm_segment_t fs;
@@ -128,12 +130,21 @@ static int ioctl_tty(struct file *file, unsigned int cmd, unsigned long arg)
 		return -ENXIO;
 	if (file->f_op->unlocked_ioctl == NULL)
 		return -ENXIO;
-	fs = get_fs();
-	set_fs(get_ds());
+    #if LINUX_VERSION_CODE < KERNEL_VERSION(5,10,0)
+	    fs = get_fs();
+    	set_fs(KERNEL_DS);
+    #else
+        fs = force_uaccess_begin();    
+    #endif
 	retval = file->f_op->unlocked_ioctl(file, cmd, arg);
-	set_fs(fs);
+    #if LINUX_VERSION_CODE < KERNEL_VERSION(5,10,0)
+	    set_fs(fs);
+    #else
+        force_uaccess_end(fs);
+    #endif
 	return retval;
 }
+#endif  // CONFIG_SET_FS
 
 static int open_tty(serialmidi_t *serial, unsigned long mode)
 {
@@ -142,7 +153,10 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	struct tty_struct *tty = NULL;
 	struct ktermios old_termios, *ntermios;
 	struct tty_driver *driver;
-	int ldisc, speed, cflag, mstatus;
+#ifdef CONFIG_SET_FS
+	int ldisc;
+#endif
+    int speed, cflag, mstatus;
 
 	mutex_lock(&serial->open_lock);
 	if (serial->tty) {
@@ -159,7 +173,7 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	if ( tty_fp )
 		tty = tty_fp->tty;
 
-	if (tty == NULL || tty->magic != TTY_MAGIC) {
+	if (tty == NULL) {
 		snd_printk(KERN_ERR "device %s has not valid tty\n", serial->sdev);
 		retval = -EIO;
 		goto __end;
@@ -182,11 +196,15 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	}
 
 	/* select N_TTY line discipline (for sure) */
+#ifdef CONFIG_SET_FS
 	ldisc = N_TTY;
 	if ((retval = ioctl_tty(serial->file, TIOCSETD, (unsigned long)&ldisc)) < 0) {
 		snd_printk(KERN_ERR "TIOCSETD (N_TTY) failed for tty %s\n", serial->sdev);
 		goto __end;
 	}
+#else
+    tty_set_ldisc(tty, N_TTY);
+#endif
 
 	switch (serial->speed) {
 	case 9600:
@@ -225,28 +243,41 @@ static int open_tty(serialmidi_t *serial, unsigned long mode)
 	driver->ops->set_termios(tty, &old_termios);
 	serial->tty = tty;
 
+#ifdef CONFIG_SET_FS
 	if ((retval = ioctl_tty(serial->file, TIOCMGET, (unsigned long)&mstatus)) < 0) {
 		snd_printk(KERN_ERR "TIOCMGET failed for tty %s\n", serial->sdev);
 		goto __end;
 	}
+#else
+	mstatus = tty->ops->tiocmget(tty);
+#endif
 
 	/* DTR , RTS , LE ON */
 	mstatus |= TIOCM_DTR;
 	mstatus |= TIOCM_RTS;
 	mstatus |= TIOCM_LE;
 
+#ifdef CONFIG_SET_FS
 	if ((retval = ioctl_tty(serial->file, TIOCMSET, (unsigned long)&mstatus)) < 0) {
-		snd_printk(KERN_ERR "TIOCMSET failed for tty %s\n", serial->sdev);
+		snd_printk(KERN_ERR "TIOCMSET failed for tty %s errno %d\n", serial->sdev, retval);
 		goto __end;
 	}
+#else
+    if ((retval = tty->ops->tiocmset(tty, TIOCM_DTR | TIOCM_RTS | TIOCM_LE, 0)) != 0) {
+		snd_printk(KERN_ERR "TIOCMSET failed for tty %s errno %d\n", serial->sdev, retval);
+		goto __end;
+	}
+#endif
 
-	serial->old_low_latency = tty->port->low_latency;
+	// serial->old_low_latency = tty->port->low_latency;
 	serial->old_exclusive = test_bit(TTY_EXCLUSIVE, &tty->flags);
-	tty->port->low_latency = 1;
+	// tty->port->low_latency = 1;
 	set_bit(TTY_EXCLUSIVE, &tty->flags);
 
 	set_bit(mode, &serial->mode);
 	retval = 0;
+
+    snd_printk(KERN_INFO"snd-serialmidi loaded %s\n", serial->sdev);
 
       __end:
       	if (retval < 0) {
@@ -274,7 +305,7 @@ static int close_tty(serialmidi_t *serial, unsigned long mode)
 
 	tty = serial->tty;
 	if (tty) {
-		tty->port->low_latency = serial->old_low_latency;
+		// tty->port->low_latency = serial->old_low_latency;
 		if (serial->old_exclusive)
 			set_bit(TTY_EXCLUSIVE, &tty->flags);
 		else
@@ -297,7 +328,9 @@ static int kthread_rx_main( void *arg )
 	struct tty_struct *tty;
 	struct tty_ldisc *ldisc;
 	unsigned char *rx_buf;
-	int count;
+    void *cookie;
+    unsigned long offset;
+	unsigned long count;
 
 	if ( serial == NULL )
 		return 0;
@@ -309,12 +342,18 @@ static int kthread_rx_main( void *arg )
 	while ( !kthread_should_stop() )
 	{
 		if (test_bit(SERIAL_MODE_BIT_INPUT_TRIGGERED, &serial->mode)) {
-			count = ldisc->ops->read( tty, serial->file, rx_buf, RX_BUF_SIZE );
-			if ( count > 0 ) {
-				snd_rawmidi_receive( serial->substream_input, rx_buf, count );
-			} else {
-				msleep(1);
-			}
+            cookie = NULL;
+            offset = 0;
+            do {
+              count = ldisc->ops->read( tty, serial->file, rx_buf, RX_BUF_SIZE, &cookie, offset);
+              offset += count;
+              if ( count > 0 ) {
+                snd_rawmidi_receive( serial->substream_input, rx_buf, count );
+              } else {
+                msleep(1);
+                break;
+              }
+            } while(cookie);
 		}
 		schedule();
 	}
@@ -407,7 +446,7 @@ static int snd_serialmidi_input_open(struct snd_rawmidi_substream * substream)
 	serialmidi_t *serial = substream->rmidi->private_data;
 	int err;
 
-	if ((err = open_tty(serial, SERIAL_MODE_BIT_INPUT)) < 0)
+    if ((err = open_tty(serial, SERIAL_MODE_BIT_INPUT)) < 0)
 		return err;
 	serial->kthread_rx = kthread_run( kthread_rx_main, serial,
 					  "%s %d", serial->card->shortname, serial->dev_idx );
